@@ -471,7 +471,8 @@
           })
       );
     } else if (!hasGps) {
-      showStatus('Esta foto no trae GPS. Para identificarla por lo que se ve, cargá tu clave de API en "Configurar clave".', 'error');
+      showStatus('Esta foto no trae GPS, así que no hay coordenadas exactas que leer. '
+        + 'Si querés identificarla por lo que se ve en la imagen, eso necesita una clave de API.', 'error');
     }
 
     Promise.all(steps).then(function () {
@@ -558,7 +559,7 @@
   });
 
   function updateKeyButton() {
-    $('btn-config').textContent = getKey() ? 'Clave configurada ✓' : 'Configurar clave';
+    $('btn-config').textContent = getKey() ? 'Clave configurada ✓' : 'Clave de API (opcional)';
   }
 
   updateKeyButton();

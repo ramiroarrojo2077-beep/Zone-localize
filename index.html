@@ -15,10 +15,11 @@
     <span class="pin">📍</span>
     <div>
       <h1>Zone Localize</h1>
-      <p>Subí la foto de un lugar y te digo dónde es, con las coordenadas para pegar en Google Maps.</p>
+      <p>Subí la foto de un lugar y te digo dónde es, con las coordenadas para pegar en Google Maps.
+      Si la foto trae GPS no hace falta configurar nada.</p>
     </div>
   </div>
-  <button id="btn-config" class="ghost" type="button">Configurar clave</button>
+  <button id="btn-config" class="ghost" type="button">Clave de API (opcional)</button>
 </header>
 
 <main>
@@ -30,6 +31,7 @@
       <div class="dz-icon">🖼️</div>
       <p class="dz-title">Arrastrá una foto acá</p>
       <p class="dz-sub">o hacé clic para elegirla · JPG, PNG, WebP · también podés pegar con Ctrl+V</p>
+      <p class="dz-note">Se lee todo en tu navegador: la foto no sale de acá salvo que actives el reconocimiento visual.</p>
     </div>
   </section>
 
@@ -93,6 +95,11 @@
 <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal-box">
     <h2 id="modal-title">Clave de API de Anthropic</h2>
+    <p class="muted">
+      <strong>Es opcional.</strong> Sin clave, la app igual lee el GPS de los metadatos y te da las
+      coordenadas exactas. La clave suma el reconocimiento visual, que sirve para las fotos que
+      vienen sin GPS.
+    </p>
     <p class="muted">
       El reconocimiento visual usa Claude. La página no tiene servidor propio: la clave se guarda solo en
       este navegador (<code>localStorage</code>) y viaja únicamente a <code>api.anthropic.com</code>.

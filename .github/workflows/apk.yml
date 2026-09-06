@@ -72,3 +72,20 @@ jobs:
           fi
 
           gh release upload apk-latest zone-localize.apk --clobber
+
+      # Segunda vía de descarga, por raw.githubusercontent.com. Se actualiza
+      # acá para que no sirva un APK viejo. El filtro de "paths" no incluye
+      # dist/, así que este push no vuelve a disparar el workflow.
+      - name: Actualizar la copia en dist/
+        run: |
+          set -euo pipefail
+          cp zone-localize.apk dist/zone-localize.apk
+          if git diff --quiet -- dist/zone-localize.apk; then
+            echo "El APK no cambió; no hay nada que commitear."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f dist/zone-localize.apk
+          git commit -m "Actualizar el APK de dist/ desde ${GITHUB_SHA:0:7} [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
