@@ -34,15 +34,22 @@ sigue funcionando con el GPS de los metadatos.
 Hay una app que envuelve la página en un WebView, para usarla desde el celular sin abrir el navegador.
 El APK lo compila GitHub Actions (`.github/workflows/apk.yml`), porque el runner ya trae el Android SDK.
 
-**Bajarlo:**
+**Bajarlo** — link directo, sin login y sin descomprimir nada:
 
-1. Entrá a la pestaña [Actions](https://github.com/ramiroarrojo2077-beep/Zone-localize/actions) del repo.
-2. Abrí la última corrida de **Compilar APK** que esté en verde.
-3. Al final de la página, en **Artifacts**, bajá `zone-localize-apk`.
-4. Descomprimí y pasá el `.apk` al teléfono. Al instalarlo, Android va a pedir permiso para
-   "instalar apps desconocidas": es lo normal para una app que no viene de Play Store.
+```
+https://github.com/ramiroarrojo2077-beep/Zone-localize/releases/latest/download/zone-localize.apk
+```
 
-Está firmado con la clave de debug, así que sirve para uso personal pero no para publicar en Play Store.
+Se puede abrir tal cual desde el celular. La URL no cambia: cada compilación reemplaza el archivo,
+así que siempre sirve la última versión.
+
+Al instalarlo, Android va a pedir permiso para "instalar apps desconocidas": es lo normal para una
+app que no viene de Play Store. Está firmado con la clave de debug, así que sirve para uso personal
+pero no para publicar en Play Store.
+
+Cada corrida del workflow deja además el APK como artefacto en la pestaña
+[Actions](https://github.com/ramiroarrojo2077-beep/Zone-localize/actions), por si hace falta una
+versión anterior.
 
 **Detalles de la implementación**, que son los que hacen que funcione de verdad:
 
