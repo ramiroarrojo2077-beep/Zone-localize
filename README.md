@@ -29,6 +29,34 @@ Para el reconocimiento visual hace falta una clave de API de Anthropic: tocá **
 Se consigue en [console.anthropic.com](https://console.anthropic.com/settings/keys). Sin clave, la página
 sigue funcionando con el GPS de los metadatos.
 
+## App para Android (APK)
+
+Hay una app que envuelve la página en un WebView, para usarla desde el celular sin abrir el navegador.
+El APK lo compila GitHub Actions (`.github/workflows/apk.yml`), porque el runner ya trae el Android SDK.
+
+**Bajarlo:**
+
+1. Entrá a la pestaña [Actions](https://github.com/ramiroarrojo2077-beep/Zone-localize/actions) del repo.
+2. Abrí la última corrida de **Compilar APK** que esté en verde.
+3. Al final de la página, en **Artifacts**, bajá `zone-localize-apk`.
+4. Descomprimí y pasá el `.apk` al teléfono. Al instalarlo, Android va a pedir permiso para
+   "instalar apps desconocidas": es lo normal para una app que no viene de Play Store.
+
+Está firmado con la clave de debug, así que sirve para uso personal pero no para publicar en Play Store.
+
+**Detalles de la implementación**, que son los que hacen que funcione de verdad:
+
+- Los archivos **no** se cargan con `file://`. Ese esquema da origen `null`, y ahí el WebView bloquea
+  `localStorage` (donde vive la clave de API) y la llamada a la API de Anthropic por CORS. Se sirven con
+  `WebViewAssetLoader` desde un origen `https` virtual, y la página se comporta igual que en un navegador.
+- Está implementado `onShowFileChooser`: sin eso, el botón de elegir foto no hace nada dentro de un WebView.
+- Los enlaces a Google Maps y Street View se abren en la app externa; el mapa incrustado sigue adentro.
+- El botón atrás navega el historial de la página antes de cerrar la app.
+- Se aplican los insets del sistema, porque desde Android 15 el contenido va debajo de la barra de estado.
+
+La página es la misma: al compilar, los cuatro archivos de la raíz se copian a los assets de la app,
+así que no hay dos copias que se desincronicen.
+
 ## Correrla localmente
 
 No hay build ni dependencias. Alcanza con abrir `index.html` en el navegador, aunque conviene servirla por HTTP:
@@ -77,4 +105,5 @@ index.html   estructura de la página
 styles.css   estilos
 app.js       flujo, llamadas a la API y render de resultados
 exif.js      lector de EXIF/GPS propio, sin dependencias
+android/     app Android que envuelve la página en un WebView
 ```
