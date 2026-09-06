@@ -46,6 +46,12 @@ android {
 tasks.named('preBuild') { dependsOn copyWebApp }
 
 dependencies {
+    // Alinea kotlin-stdlib con kotlin-stdlib-jdk7/jdk8, que alguna dependencia
+    // de AndroidX arrastra en una versión vieja. Sin esto el build falla por
+    // clases duplicadas: desde Kotlin 1.8 esos dos artefactos se fusionaron
+    // dentro de kotlin-stdlib.
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.9.24')
+
     implementation 'androidx.core:core:1.13.1'
     implementation 'androidx.webkit:webkit:1.12.1'
     implementation 'androidx.activity:activity:1.9.3'
