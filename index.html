@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zone Localize — ¿Dónde está esta foto?</title>
+<meta name="description" content="Subí la foto de un lugar y obtené la ubicación y las coordenadas listas para pegar en Google Maps.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📍</text></svg>">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="pin">📍</span>
+    <div>
+      <h1>Zone Localize</h1>
+      <p>Subí la foto de un lugar y te digo dónde es, con las coordenadas para pegar en Google Maps.</p>
+    </div>
+  </div>
+  <button id="btn-config" class="ghost" type="button">Configurar clave</button>
+</header>
+
+<main>
+
+  <!-- ---------- Zona de carga ---------- -->
+  <section id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Subir una foto">
+    <input type="file" id="file-input" accept="image/*" hidden>
+    <div class="dz-inner">
+      <div class="dz-icon">🖼️</div>
+      <p class="dz-title">Arrastrá una foto acá</p>
+      <p class="dz-sub">o hacé clic para elegirla · JPG, PNG, WebP · también podés pegar con Ctrl+V</p>
+    </div>
+  </section>
+
+  <!-- ---------- Vista previa ---------- -->
+  <section id="preview-card" class="card hidden">
+    <div class="preview-grid">
+      <img id="preview-img" alt="Foto cargada">
+      <div class="preview-meta">
+        <h2 id="file-name">—</h2>
+        <p id="file-info" class="muted">—</p>
+        <div class="row">
+          <button id="btn-analyze" class="primary" type="button">Identificar el lugar</button>
+          <button id="btn-reset" class="ghost" type="button">Cambiar foto</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- Estado ---------- -->
+  <section id="status" class="status hidden" aria-live="polite"></section>
+
+  <!-- ---------- Resultados ---------- -->
+  <section id="results" class="results hidden">
+
+    <!-- GPS incrustado en la foto -->
+    <article id="card-exif" class="card hidden">
+      <div class="card-head">
+        <h2>GPS de la foto</h2>
+        <span class="badge badge-exact">Dato exacto</span>
+      </div>
+      <p class="card-note">Coordenadas leídas de los metadatos EXIF: las grabó la cámara al sacar la foto.</p>
+      <div id="exif-body"></div>
+    </article>
+
+    <!-- Reconocimiento visual -->
+    <article id="card-vision" class="card hidden">
+      <div class="card-head">
+        <h2>Reconocimiento visual</h2>
+        <span id="vision-confidence" class="badge">—</span>
+      </div>
+      <p class="card-note">Identificación a partir de lo que se ve en la imagen. Verificá siempre antes de darlo por cierto.</p>
+      <div id="vision-body"></div>
+    </article>
+
+    <!-- Sin metadatos -->
+    <article id="card-empty" class="card hidden">
+      <h2>Sin GPS en el archivo</h2>
+      <p id="empty-note" class="card-note"></p>
+      <ul class="tips">
+        <li>WhatsApp, Instagram y Telegram borran el GPS al comprimir la imagen. Pasá el archivo original (como "documento" / "archivo").</li>
+        <li>En iPhone, al compartir tocá <strong>Opciones → Ubicación: desactivada</strong> para ver si estás quitando el dato.</li>
+        <li>Las capturas de pantalla y las fotos bajadas de internet nunca traen GPS.</li>
+        <li id="tip-key">Igual podés identificarla por lo que se ve: cargá tu clave en <strong>Configurar clave</strong> y volvé a analizar.</li>
+      </ul>
+    </article>
+
+  </section>
+</main>
+
+<!-- ---------- Modal de configuración ---------- -->
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-box">
+    <h2 id="modal-title">Clave de API de Anthropic</h2>
+    <p class="muted">
+      El reconocimiento visual usa Claude. La página no tiene servidor propio: la clave se guarda solo en
+      este navegador (<code>localStorage</code>) y viaja únicamente a <code>api.anthropic.com</code>.
+      Conseguí una en <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.
+    </p>
+    <label for="api-key">Clave</label>
+    <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+    <p class="warn">Nunca publiques esta página con una clave escrita en el código: quien la abra puede leerla.</p>
+    <div class="row end">
+      <button id="btn-clear-key" class="ghost danger" type="button">Borrar clave</button>
+      <button id="btn-cancel" class="ghost" type="button">Cancelar</button>
+      <button id="btn-save-key" class="primary" type="button">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>
+    Coordenadas EXIF: exactas. Reconocimiento visual: una estimación, puede equivocarse.
+    Geocodificación y mapas por <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>.
+  </p>
+</footer>
+
+<script src="exif.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+# Zone Localize
+
+Página web para saber **dónde fue tomada una foto** y obtener las **coordenadas listas para pegar en Google Maps**.
+
+Funciona con fotos de cualquier lado: la vidriera de un shopping, una esquina, un aeropuerto, una plaza.
+
+## Cómo funciona
+
+La página intenta dos caminos independientes y muestra los dos resultados cuando ambos dan algo:
+
+| Camino | De dónde salen las coordenadas | Precisión |
+|---|---|---|
+| **GPS de la foto** | Metadatos EXIF que graba la cámara al disparar | Exacta (metros) |
+| **Reconocimiento visual** | Claude analiza lo que se ve: carteles, marcas, arquitectura, idioma, vegetación | Estimación |
+
+El primero corre entero en el navegador y es instantáneo. El segundo manda la imagen a la API de Anthropic
+y después confirma el lugar contra OpenStreetMap para no depender de la latitud y longitud que recuerde el modelo.
+
+El resultado siempre incluye las coordenadas en formato `lat, lon` con un botón para copiar, un enlace directo a
+Google Maps, otro a Street View y un mapa incrustado.
+
+## Uso
+
+1. Abrí `index.html` (o la página publicada).
+2. Arrastrá la foto, hacé clic para elegirla, o pegala con `Ctrl+V`.
+3. Tocá **Identificar el lugar**.
+
+Para el reconocimiento visual hace falta una clave de API de Anthropic: tocá **Configurar clave** y pegala.
+Se consigue en [console.anthropic.com](https://console.anthropic.com/settings/keys). Sin clave, la página
+sigue funcionando con el GPS de los metadatos.
+
+## Correrla localmente
+
+No hay build ni dependencias. Alcanza con abrir `index.html` en el navegador, aunque conviene servirla por HTTP:
+
+```bash
+python3 -m http.server 8000
+# después: http://localhost:8000
+```
+
+## Publicarla
+
+Es un sitio estático: se puede subir a GitHub Pages tal cual (Settings → Pages → rama y carpeta raíz),
+o a cualquier hosting de archivos.
+
+## Sobre la clave de API y la privacidad
+
+- La clave se guarda **solo en tu navegador**, en `localStorage`, y viaja únicamente a `api.anthropic.com`.
+- Al usar el reconocimiento visual, la foto se envía a la API de Anthropic. El GPS de los metadatos, en cambio,
+  se lee sin que la foto salga de tu máquina.
+- **No publiques esta página con una clave escrita en el código**: cualquiera que la abra puede leerla.
+  Cada persona carga la suya.
+- Cada análisis consume tokens de tu cuenta. La imagen se reduce a 1568 px de lado antes de enviarla para
+  no gastar de más.
+
+## Por qué muchas fotos no traen GPS
+
+- WhatsApp, Instagram y Telegram borran los metadatos al comprimir. Mandá el archivo original, como "documento".
+- En iPhone, al compartir: **Opciones → Ubicación** decide si el GPS viaja o no.
+- Las capturas de pantalla y las imágenes bajadas de internet nunca lo traen.
+- Los HEIC de iPhone no los lee esta página; convertilos a JPG.
+
+En todos esos casos queda el reconocimiento visual, que trabaja sobre la imagen y no sobre los metadatos.
+
+## Límites conocidos
+
+- El reconocimiento visual **puede equivocarse**. La tarjeta muestra el nivel de confianza, las pistas concretas
+  que usó y otras posibilidades. Verificá antes de darlo por cierto.
+- Los interiores sin carteles ni marcas visibles son difíciles: un pasillo neutro de shopping puede ser cualquiera.
+- El lector de EXIF cubre JPEG y TIFF/DNG. No abre HEIC ni RAW propietarios.
+- La geocodificación usa la API pública de Nominatim, que tiene límite de una consulta por segundo.
+
+## Estructura
+
+```
+index.html   estructura de la página
+styles.css   estilos
+app.js       flujo, llamadas a la API y render de resultados
+exif.js      lector de EXIF/GPS propio, sin dependencias
+```
