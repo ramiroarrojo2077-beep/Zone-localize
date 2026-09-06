@@ -12,8 +12,9 @@ on:
       - 'exif.js'
       - '.github/workflows/apk.yml'
 
+# Hace falta escritura para publicar el APK como Release.
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -39,8 +40,35 @@ jobs:
           cp android/app/build/outputs/apk/debug/app-debug.apk zone-localize.apk
           ls -lh zone-localize.apk
 
+      # Primero el artefacto: queda disponible aunque falle la publicación.
       - uses: actions/upload-artifact@v4
         with:
           name: zone-localize-apk
           path: zone-localize.apk
           if-no-files-found: error
+
+      # El Release da un link de descarga directo, sin login y sin zip.
+      # El tag es fijo, así que la URL /releases/latest/download/ no cambia
+      # entre compilaciones.
+      - name: Publicar el APK como Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          NOTAS="APK de depuración compilado desde ${GITHUB_SHA:0:7} el $(date -u '+%Y-%m-%d %H:%M UTC').
+
+          Descarga directa: https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/zone-localize.apk
+
+          Al instalarlo, Android pide permiso para instalar apps de origen desconocido.
+          Está firmado con la clave de depuración: sirve para uso personal, no para Play Store."
+
+          if gh release view apk-latest >/dev/null 2>&1; then
+            gh release edit apk-latest --notes "$NOTAS"
+          else
+            gh release create apk-latest \
+              --title 'Zone Localize — último APK' \
+              --notes "$NOTAS" \
+              --target "$GITHUB_SHA"
+          fi
+
+          gh release upload apk-latest zone-localize.apk --clobber
