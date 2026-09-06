@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mismo fondo que la página, para que no destelle en blanco al abrir. -->
+    <color name="app_background">#0D1117</color>
+    <color name="ic_launcher_background">#1B2735</color>
+</resources>
